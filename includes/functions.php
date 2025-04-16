@@ -40,7 +40,7 @@ function generate_password($length = 16, $options = []) {
     if ($options['symbols']) $chars .= '!@#$%^&*()-_=+[]{}|;:,.<>?';
     
     if (empty($chars)) {
-        throw new Exception('At least one character type must be selected');
+        throw new Exception('Au moins un type de caractère doit être sélectionné');
     }
     
     $password = '';

@@ -10,6 +10,7 @@ $options = [
     'numbers' => true,
     'symbols' => true
 ];
+$error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $length = (int)$_POST['length'];
@@ -33,8 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <p>Créez des mots de passe forts et aléatoires pour vos comptes</p>
 </div>
 
+<?php if (!empty($error)): ?>
+    <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+<?php endif; ?>
+
 <div class="generator-container">
     <form method="POST" class="generator-form">
+        <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
         <div class="form-group">
             <label for="generated_password">Mot de passe généré</label>
             <div class="password-display">

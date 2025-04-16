@@ -1,79 +1,93 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Mise à jour de l'affichage de la longueur
     const lengthSlider = document.getElementById('length');
     const lengthValue = document.getElementById('length-value');
-    const generatedPassword = document.getElementById('generated_password');
+    
+    if (lengthSlider && lengthValue) {
+        lengthValue.textContent = lengthSlider.value;
+        lengthSlider.addEventListener('input', function() {
+            lengthValue.textContent = this.value;
+        });
+    }
+
+    // Gestion de la copie du mot de passe
+    document.querySelectorAll('.copy-password').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            
+            if (input) {
+                input.select();
+                document.execCommand('copy');
+                
+                // Feedback visuel
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Copié!';
+                this.classList.add('success');
+                
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.classList.remove('success');
+                }, 2000);
+            }
+        });
+    });
+
+    // Calcul de la force du mot de passe
+    const passwordInput = document.getElementById('generated_password');
     const strengthBar = document.getElementById('strength-bar');
     const strengthFeedback = document.getElementById('strength-feedback');
     
-    // Update length value display
-    lengthSlider.addEventListener('input', function() {
-        lengthValue.textContent = this.value;
-        updatePasswordStrength();
-    });
-    
-    // Generate password on form submit
-    document.querySelector('.generator-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        updatePasswordStrength();
-    });
-    
-    // Copy password button
-    document.querySelector('.copy-password').addEventListener('click', function() {
-        if (!generatedPassword.value) return;
-        
-        generatedPassword.select();
-        document.execCommand('copy');
-        
-        // Show tooltip
-        const originalText = this.innerHTML;
-        this.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        
-        setTimeout(() => {
-            this.innerHTML = originalText;
-        }, 2000);
-    });
-    
-    // Update password strength meter
     function updatePasswordStrength() {
-        const length = parseInt(lengthSlider.value);
-        const uppercase = document.getElementById('uppercase').checked;
-        const lowercase = document.getElementById('lowercase').checked;
-        const numbers = document.getElementById('numbers').checked;
-        const symbols = document.getElementById('symbols').checked;
+        const password = passwordInput.value;
         
-        // Calculate strength (0-100)
-        let strength = 0;
-        let feedback = '';
-        
-        // Length contributes up to 50 points
-        strength += Math.min(length / 64 * 50, 50);
-        
-        // Character variety contributes up to 50 points
-        const varietyCount = [uppercase, lowercase, numbers, symbols].filter(Boolean).length;
-        strength += (varietyCount / 4) * 50;
-        
-        // Adjust feedback based on strength
-        if (strength < 30) {
-            feedback = 'Very Weak';
-            strengthBar.style.backgroundColor = '#f72585';
-        } else if (strength < 50) {
-            feedback = 'Weak';
-            strengthBar.style.backgroundColor = '#f8961e';
-        } else if (strength < 70) {
-            feedback = 'Moderate';
-            strengthBar.style.backgroundColor = '#4cc9f0';
-        } else if (strength < 90) {
-            feedback = 'Strong';
-            strengthBar.style.backgroundColor = '#4361ee';
-        } else {
-            feedback = 'Very Strong';
-            strengthBar.style.backgroundColor = '#3a0ca3';
+        if (!password) {
+            strengthBar.style.width = '0%';
+            strengthFeedback.textContent = '';
+            return;
         }
         
-        strengthBar.style.width = `${Math.min(strength, 100)}%`;
-        strengthFeedback.textContent = feedback;
+        let strength = 0;
+        const length = password.length;
+        
+        // Points pour la longueur
+        strength += Math.min(length * 3, 40);
+        
+        // Points pour la diversité
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSymbol = /[^A-Za-z0-9]/.test(password);
+        
+        const diversity = [hasUpper, hasLower, hasNumber, hasSymbol].filter(Boolean).length;
+        strength += (diversity - 1) * 15;
+        
+        // Ajustement final
+        strength = Math.max(0, Math.min(100, strength));
+        
+        // Mise à jour de l'UI
+        strengthBar.style.width = strength + '%';
+        
+        // Couleur et feedback
+        if (strength < 30) {
+            strengthBar.style.backgroundColor = '#ff4d4d';
+            strengthFeedback.textContent = 'Faible';
+        } else if (strength < 70) {
+            strengthBar.style.backgroundColor = '#ffcc00';
+            strengthFeedback.textContent = 'Moyen';
+        } else {
+            strengthBar.style.backgroundColor = '#4CAF50';
+            strengthFeedback.textContent = 'Fort';
+        }
     }
     
-    // Initialize strength meter
-    updatePasswordStrength();
+    // Écouteur d'événement
+    if (passwordInput) {
+        passwordInput.addEventListener('input', updatePasswordStrength);
+        
+        // Mettre à jour au chargement si mot de passe déjà généré
+        if (passwordInput.value) {
+            updatePasswordStrength();
+        }
+    }
 });

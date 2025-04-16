@@ -40,7 +40,30 @@ function get_current_user_data() {
             redirect('/pages/login.php');
         }
     }
-    
+    function calculate_password_strength($password) {
+        $score = 0;
+        
+        // Longueur du mot de passe
+        $length = strlen($password);
+        if ($length < 8) return 0;
+        
+        $score += min(($length - 8) * 2, 20); // Max 20 points pour la longueur
+        
+        // Diversité des caractères
+        $types = 0;
+        if (preg_match('/[A-Z]/', $password)) $types++;
+        if (preg_match('/[a-z]/', $password)) $types++;
+        if (preg_match('/[0-9]/', $password)) $types++;
+        if (preg_match('/[^A-Za-z0-9]/', $password)) $types++;
+        
+        $score += ($types - 1) * 10; // 0-30 points pour la diversité
+        
+        // Vérification des motifs simples
+        if (preg_match('/(.)\1{2,}/', $password)) $score -= 15;
+        if (preg_match('/123|abc|qwe|asd|zxc/', strtolower($password))) $score -= 20;
+        
+        return max(0, min(100, $score)); // Score entre 0 et 100
+    }
     return $user;
 }
 ?>
