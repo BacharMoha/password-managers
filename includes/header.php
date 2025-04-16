@@ -13,7 +13,7 @@
     <div class="app-container">
         <nav class="sidebar">
             <div class="sidebar-header">
-                <img src="/assets/img/logo.svg" alt="Logo" class="logo">
+                <!-- <img src="/assets/img/logo.svg" alt="Logo" class="logo"> -->
                 <h1><?= APP_NAME ?></h1>
             </div>
             <ul class="sidebar-menu">

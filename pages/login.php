@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <img src="/assets/img/logo.svg" alt="Logo" class="auth-logo">
+                <!-- <img src="/assets/img/logo.svg" alt="Logo" class="auth-logo"> -->
                 <h1>Bienvenue sur <?= APP_NAME ?></h1>
                 <p>Connectez-vous pour accéder à vos mots de passe</p>
             </div>
